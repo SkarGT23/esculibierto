@@ -1,0 +1,24 @@
+# ESCULIBIERTO - El Juego de la Serpiente 🐍
+
+¡Bienvenido a **ESCULIBIERTO**, un emocionante juego de la serpiente version ASTURIAS, puntuaciones y desafíos únicos! 🎮
+
+## Características principales
+- **Niveles dinámicos** : Juega en diferentes niveles con obstáculos y desafíos únicos.
+- **Controles intuitivos**: Usa las teclas de dirección para mover la serpiente y recoger comida.
+- **Comida especial**: Obtén bonificaciones con comida especial y evita la manzana negra.
+- **Tabla de puntuaciones**: Guarda tus mejores resultados y compite con otros jugadores.
+- **Mensajes motivacionales**: ¡Recibe frases únicas mientras juegas! unicos tipicos de ASTURIES
+
+## Requisitos del sistema
+- Python 3.8 o superior
+- Django 5.1 o superior
+- Navegador web moderno (Chrome, Firefox, Edge, etc.)
+
+## Instalación
+1. Clona este repositorio:
+   ```bash
+   git clone https://github.com/tu-usuario/esculibierto.git
+   cd esculibierto
+
+
+#----------------------------------------------------------------------------------------------------------------
