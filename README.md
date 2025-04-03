@@ -65,4 +65,3 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ## Contacto
 - GitHub: [@SkarGT23](https://github.com/SkarGT23)
-- Email: [tu-email@ejemplo.com]
