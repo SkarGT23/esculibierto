@@ -50,7 +50,7 @@
 ## Puntuación
 - 🍎 Manzana normal: +10 puntos
 - 🍏 Manzana verde: +20 puntos y velocidad extra
-- ⚫ Manzana negra: -50 puntos ¡Evítala!
+- ⚫ Manzana negra: -5 puntos ¡Evítala!
 
 ## Contribuir
 ¡Las contribuciones son bienvenidas! Si tienes ideas para mejorar el juego:
