@@ -19,6 +19,50 @@
    ```bash
    git clone https://github.com/SkarGT23/esculibierto.git
    cd esculibierto
+   ```
 
+2. Crea un entorno virtual e instala las dependencias:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # En Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-#----------------------------------------------------------------------------------------------------------------
+3. Configura la base de datos:
+   ```bash
+   python manage.py migrate
+   ```
+
+4. Inicia el servidor de desarrollo:
+   ```bash
+   python manage.py runserver
+   ```
+
+5. Abre tu navegador y visita `http://localhost:8000`
+
+## Controles del juego
+- ⬆️ Flecha arriba: Mover hacia arriba
+- ⬇️ Flecha abajo: Mover hacia abajo
+- ⬅️ Flecha izquierda: Mover a la izquierda
+- ➡️ Flecha derecha: Mover a la derecha
+- Espacio: Pausar/Reanudar juego
+
+## Puntuación
+- 🍎 Manzana normal: +10 puntos
+- 🍏 Manzana verde: +20 puntos y velocidad extra
+- ⚫ Manzana negra: -50 puntos ¡Evítala!
+
+## Contribuir
+¡Las contribuciones son bienvenidas! Si tienes ideas para mejorar el juego:
+1. Haz un fork del repositorio
+2. Crea una rama para tu función: `git checkout -b nueva-funcion`
+3. Realiza tus cambios y haz commit: `git commit -m 'Añade nueva función'`
+4. Empuja a la rama: `git push origin nueva-funcion`
+5. Abre un Pull Request
+
+## Licencia
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## Contacto
+- GitHub: [@SkarGT23](https://github.com/SkarGT23)
+- Email: [tu-email@ejemplo.com]
