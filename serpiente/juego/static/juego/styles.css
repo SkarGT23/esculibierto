@@ -2,7 +2,7 @@
 body {
     font-family: 'Press Start 2P', cursive; /* Fuente retro de videojuegos */
     text-align: center;
-    background: linear-gradient(135deg, #1a1a1a, #333); /* Fondo con un gradiente oscuro */
+    background: linear-gradient(135deg, #232b3b 0%, #3a465d 100%); /* Fondo más suave y luminoso */
     color: #fff;
     margin: 0;
     padding: 0;
@@ -19,6 +19,8 @@ canvas {
     margin-top: 20px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.7); /* Efecto de resplandor */
+    background: repeating-linear-gradient(135deg, #232b3b 0px, #232b3b 20px, #31405a 20px, #31405a 40px);
+    /* Patrón sutil para mayor sensación de movimiento */
 }
 
 /* Contenedor de botones */

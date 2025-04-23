@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let food = { x: 100, y: 100 };
     let specialFood = null;
     let blackApple = null;
+    let brownBean = null;
+    let isDoubleSpeed = false;
+    let doubleSpeedTimeout = null;
+    let normalInterval = 100;
+    let fastInterval = 50;
     let direction = { x: 0, y: 0 };
     let score = 0;
     let redFoodCount = 0;
@@ -250,57 +255,179 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dibuja la serpiente
     function drawSnake() {
-        snake.forEach(segment => {
-            const gradient = ctx.createLinearGradient(segment.x, segment.y, segment.x + gridSize, segment.y + gridSize);
-            gradient.addColorStop(0, '#00ff00');
-            gradient.addColorStop(1, '#00b300');
-            ctx.fillStyle = gradient;
-            ctx.strokeStyle = "#00ff00";
+        snake.forEach((segment, index) => {
+            ctx.save();
+            // Todos los segmentos iguales, rectangulares y alineados
+            ctx.fillStyle = '#00e600'; // verde vivo y uniforme
+            ctx.strokeStyle = '#00ff66';
             ctx.lineWidth = 2;
             ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
             ctx.strokeRect(segment.x, segment.y, gridSize, gridSize);
+            // Ojos solo en la cabeza
+            if (index === 0) {
+                let dx = direction.x;
+                let dy = direction.y;
+                if (dx === 0 && dy === 0) dy = -1;
+                let eyeOffsetX1 = gridSize * 0.25;
+                let eyeOffsetY1 = gridSize * 0.25;
+                let eyeOffsetX2 = gridSize * 0.75;
+                let eyeOffsetY2 = gridSize * 0.25;
+                let eyeRadius = gridSize * 0.12;
+                if (dx > 0) {
+                    eyeOffsetX1 = gridSize * 0.75;
+                    eyeOffsetY1 = gridSize * 0.25;
+                    eyeOffsetX2 = gridSize * 0.75;
+                    eyeOffsetY2 = gridSize * 0.75;
+                } else if (dx < 0) {
+                    eyeOffsetX1 = gridSize * 0.25;
+                    eyeOffsetY1 = gridSize * 0.25;
+                    eyeOffsetX2 = gridSize * 0.25;
+                    eyeOffsetY2 = gridSize * 0.75;
+                } else if (dy > 0) {
+                    eyeOffsetX1 = gridSize * 0.25;
+                    eyeOffsetY1 = gridSize * 0.75;
+                    eyeOffsetX2 = gridSize * 0.75;
+                    eyeOffsetY2 = gridSize * 0.75;
+                } else if (dy < 0) {
+                    eyeOffsetX1 = gridSize * 0.25;
+                    eyeOffsetY1 = gridSize * 0.25;
+                    eyeOffsetX2 = gridSize * 0.75;
+                    eyeOffsetY2 = gridSize * 0.25;
+                }
+                ctx.beginPath();
+                ctx.arc(segment.x + eyeOffsetX1, segment.y + eyeOffsetY1, eyeRadius, 0, 2 * Math.PI);
+                ctx.arc(segment.x + eyeOffsetX2, segment.y + eyeOffsetY2, eyeRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.strokeStyle = '#222';
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(segment.x + eyeOffsetX1, segment.y + eyeOffsetY1, eyeRadius * 0.4, 0, 2 * Math.PI);
+                ctx.arc(segment.x + eyeOffsetX2, segment.y + eyeOffsetY2, eyeRadius * 0.4, 0, 2 * Math.PI);
+                ctx.fillStyle = '#222';
+                ctx.fill();
+            }
+            ctx.restore();
         });
     }
 
     // Dibuja la comida
     function drawFood() {
-        const gradient = ctx.createRadialGradient(
-            food.x + gridSize/2, food.y + gridSize/2, 2,
-            food.x + gridSize/2, food.y + gridSize/2, gridSize/2
-        );
-        gradient.addColorStop(0, '#ff0000');
-        gradient.addColorStop(1, '#b30000');
-        ctx.fillStyle = gradient;
-        ctx.strokeStyle = "#ff4d4d";
+        // Dibuja una manzana realista
+        ctx.save();
+        // Cuerpo de la manzana (ovalada, roja)
+        ctx.beginPath();
+        ctx.ellipse(food.x + gridSize/2, food.y + gridSize/2 + 2, gridSize*0.38, gridSize*0.42, 0, 0, 2 * Math.PI);
+        let appleGradient = ctx.createRadialGradient(food.x + gridSize/2 - 2, food.y + gridSize/2 - 2, 2, food.x + gridSize/2, food.y + gridSize/2, gridSize*0.42);
+        appleGradient.addColorStop(0, '#fffbe5');
+        appleGradient.addColorStop(0.3, '#ff1c1c');
+        appleGradient.addColorStop(1, '#ff0000');
+        ctx.fillStyle = appleGradient;
+        ctx.shadowColor = '#ff1c1c';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
         ctx.lineWidth = 2;
-        ctx.fillRect(food.x, food.y, gridSize, gridSize);
-        ctx.strokeRect(food.x, food.y, gridSize, gridSize);
+        ctx.strokeStyle = '#7a1a1a';
+        ctx.stroke();
+        // Tallo
+        ctx.beginPath();
+        ctx.moveTo(food.x + gridSize/2, food.y + gridSize*0.19);
+        ctx.lineTo(food.x + gridSize/2, food.y + gridSize*0.02);
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = '#7a4a1a';
+        ctx.stroke();
+        // Hoja
+        ctx.beginPath();
+        ctx.ellipse(food.x + gridSize/2 + 5, food.y + gridSize*0.13, 4, 7, Math.PI/7, 0, 2 * Math.PI);
+        ctx.fillStyle = '#3ecf3e';
     }
 
-    // Dibuja la comida especial
-    function drawSpecialFood() {
-        if (specialFood) {
-            ctx.fillStyle = "#00ff00";
-            ctx.strokeStyle = "#008000";
-            ctx.lineWidth = 2;
+    // Dibuja la manzana negra (bola negra)
+    function drawBlackApple() {
+        if (blackApple) {
+            ctx.save();
             ctx.beginPath();
-            ctx.moveTo(specialFood.x + gridSize/2, specialFood.y);
-            ctx.lineTo(specialFood.x + gridSize*0.75, specialFood.y + gridSize*0.75);
-            ctx.lineTo(specialFood.x + gridSize*0.25, specialFood.y + gridSize*0.75);
-            ctx.closePath();
+            ctx.arc(blackApple.x + gridSize/2, blackApple.y + gridSize/2, gridSize*0.38, 0, 2 * Math.PI);
+            let blackGradient = ctx.createRadialGradient(blackApple.x + gridSize/2, blackApple.y + gridSize/2, 2, blackApple.x + gridSize/2, blackApple.y + gridSize/2, gridSize*0.38);
+            blackGradient.addColorStop(0, '#666');
+            blackGradient.addColorStop(0.2, '#222');
+            blackGradient.addColorStop(1, '#000');
+            ctx.fillStyle = blackGradient;
+            ctx.shadowColor = '#fff';
+            ctx.shadowBlur = 12;
             ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#333';
             ctx.stroke();
+            ctx.restore();
         }
     }
 
-    // Dibuja la manzana negra
-    function drawBlackApple() {
-        if (blackApple) {
-            ctx.fillStyle = "#000000";
-            ctx.strokeStyle = "#333333";
-            ctx.lineWidth = 2;
-            ctx.fillRect(blackApple.x, blackApple.y, gridSize, gridSize);
-            ctx.strokeRect(blackApple.x, blackApple.y, gridSize, gridSize);
+    // Dibuja la botella de sidra (botella verde)
+    function drawSpecialFood() {
+        if (specialFood) {
+            ctx.save();
+            // Cuerpo de la botella
+            ctx.beginPath();
+            ctx.ellipse(specialFood.x + gridSize/2, specialFood.y + gridSize/2 + 2, gridSize*0.18, gridSize*0.36, 0, 0, 2 * Math.PI);
+            let bottleGradient = ctx.createLinearGradient(specialFood.x, specialFood.y + gridSize, specialFood.x + gridSize, specialFood.y);
+            bottleGradient.addColorStop(0, '#00ffb3');
+            bottleGradient.addColorStop(0.3, '#00ff00');
+            bottleGradient.addColorStop(0.8, '#009900');
+            ctx.fillStyle = bottleGradient;
+            ctx.shadowColor = '#00ffb3';
+            ctx.shadowBlur = 12;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = '#0d4d0d';
+            ctx.stroke();
+            // Cuello
+            ctx.beginPath();
+            ctx.rect(specialFood.x + gridSize/2 - 4, specialFood.y + gridSize/2 - 20, 8, 12);
+            ctx.fillStyle = '#e0ffe0';
+            ctx.fill();
+            ctx.strokeStyle = '#0d4d0d';
+            ctx.stroke();
+            // Tapón
+            ctx.beginPath();
+            ctx.ellipse(specialFood.x + gridSize/2, specialFood.y + gridSize/2 - 14, 5, 3, 0, 0, 2 * Math.PI);
+            ctx.fillStyle = '#b1b1b1';
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // Dibuja la faba marrón
+    function drawBrownBean() {
+        if (brownBean) {
+            ctx.save();
+            // Faba curva y brillante
+            ctx.beginPath();
+            ctx.ellipse(brownBean.x + gridSize/2, brownBean.y + gridSize/2, gridSize*0.38, gridSize*0.22, Math.PI/6, 0, 2 * Math.PI);
+            let beanGradient = ctx.createLinearGradient(brownBean.x, brownBean.y, brownBean.x + gridSize, brownBean.y + gridSize);
+            beanGradient.addColorStop(0, '#fff89a');
+            beanGradient.addColorStop(0.3, '#ffb13b');
+            beanGradient.addColorStop(1, '#ff8000');
+            ctx.fillStyle = beanGradient;
+            ctx.shadowColor = '#ffb13b';
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = '#5C3A13';
+            ctx.stroke();
+            // Extremo más ancho (detalle)
+            ctx.beginPath();
+            ctx.ellipse(brownBean.x + gridSize/2 + 4, brownBean.y + gridSize/2 + 2, gridSize*0.09, gridSize*0.11, Math.PI/6, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fffbe5';
+            ctx.globalAlpha = 0.5;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.restore();
         }
     }
 
@@ -357,7 +484,30 @@ document.addEventListener('DOMContentLoaded', () => {
         snake.unshift(head);
 
         // Colisión con comida
-        if (head.x === food.x && head.y === food.y) {
+        if (brownBean && head.x === brownBean.x && head.y === brownBean.y) {
+            brownBean = null;
+            if (!isDoubleSpeed) {
+                isDoubleSpeed = true;
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, fastInterval);
+                showMessage("¡FABÓN! ¡VELOCIDAD X2!", '#A0522D');
+                doubleSpeedTimeout = setTimeout(() => {
+                    isDoubleSpeed = false;
+                    clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, normalInterval);
+                    showMessage("La faba se acabó...", '#A0522D', 1200);
+                }, 5000);
+            } else {
+                // Si ya está en doble velocidad, simplemente reinicia el temporizador
+                clearTimeout(doubleSpeedTimeout);
+                doubleSpeedTimeout = setTimeout(() => {
+                    isDoubleSpeed = false;
+                    clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, normalInterval);
+                    showMessage("La faba se acabó...", '#A0522D', 1200);
+                }, 5000);
+            }
+        } else if (head.x === food.x && head.y === food.y) {
             score++;
             document.getElementById("score").textContent = `Puntuación: ${score}`;
             redFoodCount++;
@@ -379,6 +529,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (redFoodCount >= 9) {
                 generateSpecialFood();
                 redFoodCount = 0;
+            }
+
+            // Probabilidad de aparición de la faba marrón (10%)
+            if (!brownBean && Math.random() < 0.1) {
+                generateBrownBean();
             }
 
             if (Math.random() < 0.3) {
@@ -439,6 +594,24 @@ document.addEventListener('DOMContentLoaded', () => {
         specialFood = newSpecialFood;
     }
 
+    // Genera faba marrón
+    function generateBrownBean() {
+        const getRandomPosition = () => ({
+            x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+            y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
+        });
+        let newBrownBean;
+        do {
+            newBrownBean = getRandomPosition();
+        } while (
+            snake.some(segment => segment.x === newBrownBean.x && segment.y === newBrownBean.y) ||
+            (food.x === newBrownBean.x && food.y === newBrownBean.y) ||
+            (specialFood && specialFood.x === newBrownBean.x && specialFood.y === newBrownBean.y) ||
+            (blackApple && blackApple.x === newBrownBean.x && blackApple.y === newBrownBean.y)
+        );
+        brownBean = newBrownBean;
+    }
+
     // Genera manzana negra
     function generateBlackApple() {
         const getRandomPosition = () => ({
@@ -480,6 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
         generateFood();
         specialFood = null;
         blackApple = null;
+        brownBean = null;
+        isDoubleSpeed = false;
+        if (doubleSpeedTimeout) clearTimeout(doubleSpeedTimeout);
+        if (gameInterval) clearInterval(gameInterval);
         startTime = null;
     }
 
@@ -489,7 +666,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         isGameRunning = false;
         clearInterval(gameInterval);
-        
+        if (doubleSpeedTimeout) clearTimeout(doubleSpeedTimeout);
+        isDoubleSpeed = false;
         // Ocultar los controles
         document.getElementById('controls').style.display = 'none';
         
@@ -514,6 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawFood();
         drawSpecialFood();
         drawBlackApple();
+        drawBrownBean();
     }
 
     // Control de teclas
@@ -556,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameRunning = true;
         startTime = Date.now();
         if (gameInterval) clearInterval(gameInterval);
-        gameInterval = setInterval(gameLoop, 100);
+        gameInterval = setInterval(gameLoop, normalInterval);
     }
 
     document.getElementById("startButton").addEventListener("click", startGame);
